@@ -53,6 +53,8 @@ def download(install, link):
 
 def compile(install):
     ctx = install.builder._ctx
+    # setup logs director for bp
+    os.makedirs(os.path.join(ctx['BUILD_DIR'], 'logs'))
     # read links file
     with open(os.path.join(ctx['BUILD_DIR'], 'download-list.txt')) as fp:
         links = [line.strip() for line in fp.readlines()]
