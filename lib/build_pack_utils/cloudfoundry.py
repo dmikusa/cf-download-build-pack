@@ -130,7 +130,7 @@ class CloudFoundryInstaller(object):
                               extract=True):
         self._log.debug("Installing direct [%s]", url)
         if not fileName:
-            fileName = url.split('/')[-1]
+            fileName = url.split('/')[-1].split('?')[0]
         if self._is_url(hsh):
             digest = self._dwn.download_direct(hsh)
         else:

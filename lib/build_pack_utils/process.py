@@ -218,8 +218,12 @@ class Printer(object):
             lines = arg.split('\n')
             lines = [self._prefix() + l if l else l for l in lines]
             new_args.append('\n'.join(lines))
-
-        self.output.write(*new_args, **kwargs)
+        try:
+            self.output.write(*new_args, **kwargs)
+        except (UnicodeEncodeError, UnicodeDecodeError):
+            self._log.error(
+                "Unicode Error while decoding line from process [%s]",
+                "Printer.write")
 
     def _prefix(self):
         time = datetime.now().strftime('%H:%M:%S')
