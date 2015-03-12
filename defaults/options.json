@@ -1,3 +1,4 @@
 {
-    "CACHE_HASH_ALGORITHM": "sha1"
+    "CACHE_HASH_ALGORITHM": "sha1",
+    "START_SCRIPT_NAME": "download-build-pack-start-script.sh"
 }
