@@ -591,7 +591,8 @@ class FileUtil(object):
             if not os.path.exists(self._from_path):
                 raise ValueError("Source path [%s] does not exist"
                                  % self._from_path)
-            for root, dirs, files in os.walk(self._from_path, topdown=False):
+            for root, dirs, files in os.walk(self._from_path.decode('utf-8'),
+                                             topdown=False):
                 for f in files:
                     fromPath = os.path.join(root, f)
                     toPath = fromPath.replace(self._from_path, self._into_path)
@@ -832,7 +833,11 @@ class SaveBuilder(object):
         # Write pool of environment items to disk, a single item is
         #  written in 'key=val' format, while lists are written as
         #  'key=val:val:val' where ':' is os.pathsep.
-        envPath = os.path.join(self._builder._ctx['BUILD_DIR'], '.env')
+        profile_d_directory = os.path.join(self._builder._ctx['BUILD_DIR'],
+                                           '.profile.d')
+        if not os.path.exists(profile_d_directory):
+            os.makedirs(profile_d_directory)
+        envPath = os.path.join(profile_d_directory, 'bp_env_vars.sh')
         with open(envPath, 'at') as envFile:
             for key, val in all_extns_env.iteritems():
                 if len(val) == 0:
@@ -841,7 +846,7 @@ class SaveBuilder(object):
                     val = val[0]
                 elif len(val) > 1:
                     val = os.pathsep.join(val)
-                envFile.write("%s=%s\n" % (key, val))
+                envFile.write("export %s=%s\n" % (key, val))
         return self
 
     def process_list(self):
