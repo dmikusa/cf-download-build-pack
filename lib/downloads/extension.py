@@ -14,7 +14,11 @@
 # limitations under the License.
 import os
 import tempfile
+import logging
 from build_pack_utils import BuildPack
+
+
+log = logging.getLogger('downloads')
 
 
 def preprocess_commands(ctx):
@@ -33,6 +37,7 @@ def service_commands(ctx):
             elif webFound and line.startswith('    '):
                 lines.append(line.strip())
         proc = " ".join(lines)
+    log.debug("Proc List Found: %s", proc)
     return {
         'web': [proc]
     }
@@ -58,25 +63,35 @@ def compile(install):
     # read links file
     with open(os.path.join(ctx['BUILD_DIR'], 'download-list.txt')) as fp:
         links = [line.strip() for line in fp.readlines()]
+    log.info("Loaded %d downloads.", len(links))
     # download links
     for link in links:
+        log.debug("Preparing to download [%s]", link)
         if link.startswith('http'):
             download(install, link)
         else:
             print 'Not sure how to handle [%s], skipping.' % link
+    log.info("All downloads complete.")
     # read build pack
     with open(os.path.join(ctx['BUILD_DIR'], 'build-pack.txt')) as fp:
         bp_link = fp.read().strip()
+    log.info("Running build pack [%s]", bp_link)
     if bp_link.find('#') >= 0:
         (bp_link, bp_ver) = bp_link.split('#')
         bp = BuildPack(ctx, bp_link, bp_ver)
     else:
         bp = BuildPack(ctx, bp_link)
     # run build pack
+    log.info("Cloning build pack")
     bp._clone()
+    log.info("Compiling build pack")
     bp._compile()
     # save output from release
+    log.info("Running release script")
     release_path = os.path.join(tempfile.gettempdir(), 'release.out')
     with open(release_path, 'wt') as fp:
-        fp.write(bp._release())
+        result = bp._release()
+        log.debug("Build pack release returned [%s]", result)
+        fp.write(result)
+    log.debug("Compile done.")
     return 0
