@@ -64,7 +64,6 @@ class TestApp1(BaseTestCompile):
             self.assert_exists(self.build_dir, 'snake')
             self.assert_exists(self.build_dir, 'snake', 'snake.html')
             self.assert_exists(self.build_dir, '.bp')
-            self.assert_exists(self.build_dir, '.env')
             self.assert_exists(self.build_dir, '.procs')
             self.assert_exists(self.build_dir, 'start.sh')
             # check release command
@@ -106,7 +105,7 @@ class TestApp2(BaseTestCompile):
             self.assert_exists(self.build_dir, 'META-INF')
             self.assert_exists(self.build_dir, 'WEB-INF')
             self.assert_exists(self.build_dir, '.bp')
-            self.assert_exists(self.build_dir, '.env')
+            self.assert_exists(self.build_dir, '.profile.d/bp_env_vars.sh')
             self.assert_exists(self.build_dir, '.procs')
             self.assert_exists(self.build_dir, '.java-buildpack')
             self.assert_exists(self.build_dir, '.java-buildpack.log')
@@ -154,17 +153,16 @@ class TestApp3(BaseTestCompile):
             self.assert_exists(self.build_dir, 'php')
             self.assert_exists(self.build_dir, 'htdocs')
             self.assert_exists(self.build_dir, '.bp')
-            self.assert_exists(self.build_dir, '.env')
+            self.assert_exists(self.build_dir, '.profile.d/bp_env_vars.sh')
             self.assert_exists(self.build_dir, '.procs')
             self.assert_exists(self.build_dir, 'start.sh')
             # check release command
             with open(os.path.join(self.build_dir, '.procs')) as fp:
                 procs = [l.strip() for l in fp.readlines()]
-            eq_(4, len(procs))
+            eq_(3, len(procs))
             eq_(True, procs[0].startswith('httpd:'))
             eq_(True, procs[1].startswith('php-fpm:'))
-            eq_(True, procs[2].startswith('php-fpm-logs:'))
-            eq_(True, procs[3].startswith('web:'))
+            eq_(True, procs[2].startswith('web:'))
         except Exception, e:
             print str(e)
             if hasattr(e, 'output'):
